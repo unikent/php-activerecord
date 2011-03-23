@@ -321,7 +321,7 @@ abstract class Connection
 				$values ? ' ('.implode(', ', $values).')' : '',
 				$time
 			));
-        }
+		}
 
 		return $sth;
 	}
