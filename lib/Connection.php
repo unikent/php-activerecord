@@ -37,7 +37,7 @@ abstract class Connection
 	 */
 	private $logging = false;
 	/**
-	 * Contains a Logger object that must impelement a log() method.
+	 * Contains a Logger object that must implement a log() method.
 	 *
 	 * @var object
 	 */
@@ -292,25 +292,37 @@ abstract class Connection
 	public function query($sql, &$values=array())
 	{
 		if ($this->logging)
-			$this->logger->log($sql);
+			$now = microtime(true);
 
 		$this->last_query = $sql;
 
 		try {
-			if (!($sth = $this->connection->prepare($sql)))
-				throw new DatabaseException($this);
+			if (!($sth = $this->connection->prepare($sql))) {
+				$exception = $this;
+			} else {
+				$sth->setFetchMode(PDO::FETCH_ASSOC);
+
+				if (!$sth->execute($values))
+					$exception = $this;
+			}
 		} catch (PDOException $e) {
-			throw new DatabaseException($this);
+			$exception = isset($sth) ? $sth : $this;
 		}
 
-		$sth->setFetchMode(PDO::FETCH_ASSOC);
-
-		try {
-			if (!$sth->execute($values))
-				throw new DatabaseException($this);
-		} catch (PDOException $e) {
-			throw new DatabaseException($sth);
+		if (isset($exception)) {
+			throw new DatabaseException($exception);
 		}
+
+		if ($this->logging) {
+			$time = microtime(true) - $now;
+			$this->logger->log(sprintf(
+				"%s --%s %.3f",
+				preg_replace('/\s+/', ' ', $sql),
+				$values ? ' ('.implode(', ', $values).')' : '',
+				$time
+			));
+        }
+
 		return $sth;
 	}
 
