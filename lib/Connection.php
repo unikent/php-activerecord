@@ -315,12 +315,20 @@ abstract class Connection
 
 		if ($this->logging) {
 			$time = microtime(true) - $now;
-			$this->logger->log(sprintf(
-				"%s --%s %.3f",
-				preg_replace('/\s+/', ' ', $sql),
-				$values ? ' ('.implode(', ', $values).')' : '',
-				$time
-			));
+			$sql = preg_replace('/\s+/', ' ', $sql);
+			if ($values) {
+				$values = array_map(function($v) {
+					if (is_null($v))
+						return 'NULL';
+					if (is_string($v))
+						return "'".addslashes($v)."'";
+					return $v;
+				}, $values);
+				$data = ' ('.implode(',', $values).')';
+			} else {
+				$data = '';
+			}
+			$this->logger->log(sprintf("%s --%s %.3f", $sql, $data, $time));
 		}
 
 		return $sth;
