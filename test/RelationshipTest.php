@@ -698,5 +698,12 @@ class RelationshipTest extends DatabaseTest
 	{
 		Author::find(999999, array('include' => array('books')));
 	}
+
+	public function test_get_relationship_names()
+	{
+		$venue = Venue::find(1);
+		$expected_relationship_names = array('events', 'hosts');
+		$this->assert_equals($venue->table()->get_relationship_names(), $expected_relationship_names);
+	}
 };
 ?>

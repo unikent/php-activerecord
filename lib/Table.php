@@ -316,6 +316,14 @@ class Table
 		return array_key_exists($name, $this->relationships);
 	}
 
+	/**
+	 * Get an array of relationship names
+	 *
+	 */
+	public function get_relationship_names() {
+		return array_keys($this->relationships);
+	}
+
 	public function insert(&$data, $pk=null, $sequence_name=null)
 	{
 		$data = $this->process_data($data);

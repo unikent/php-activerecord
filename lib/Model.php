@@ -762,11 +762,29 @@ class Model
 	 * If saving an existing model only data that has changed will be saved.
 	 *
 	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
+	 * @param boolean $associations Set to true if you want to save associated models at the same time.
 	 * @return boolean True if the model was saved to the database otherwise false
 	 */
-	public function save($validate=true)
+	public function save($validate=true,$associations=true)
 	{
 		$this->verify_not_readonly('save');
+
+		if($associations) {
+			foreach($this->table()->get_relationship_names() as $name) {
+				if(array_key_exists($name, $this->__relationships)){
+					//its been loaded in so save it.
+					$value = $this->$name;
+					if(is_array($value)) {
+						//loop through
+						foreach($value as $model) {
+							$model->save(true, false);
+						}
+					} else {
+						$value->save(true, false);
+					}
+				}
+			}
+		}
 		return $this->is_new_record() ? $this->insert($validate) : $this->update($validate);
 	}
 
@@ -775,6 +793,7 @@ class Model
 	 *
 	 * @see save
 	 * @param boolean $validate Set to true or false depending on if you want the validators to run or not
+	 * @param boolean $associations Set to true if you want to save associated models at the same time.
 	 * @return boolean True if the model was saved to the database otherwise false
 	 */
 	private function insert($validate=true)

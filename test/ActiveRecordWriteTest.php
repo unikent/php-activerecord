@@ -425,4 +425,14 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assert_equals(1, $num_affected);
 		$this->assert_true(strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1') !== false);
 	}
+
+	public function test_save_associated_models() 
+	{
+		$author = Author::find(1);
+		$author->books[0]->name = "A dogs life";
+		//var_dump($author->books);
+		$author->save();
+		$this->assert_equals($author->books[0]->name, Book::find($author->books[0]->id)->name);
+	}
+
 };
