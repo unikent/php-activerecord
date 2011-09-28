@@ -106,6 +106,7 @@ abstract class Serialization
 		$this->check_only();
 		$this->check_except();
 		$this->check_methods();
+		$this->check_getters();
 		$this->check_include();
 		$this->check_only_method();        
 	}
@@ -140,6 +141,23 @@ abstract class Serialization
 			{
 				if (method_exists($this->model, $method))
 					$this->attributes[$method] = $this->model->$method();
+			}
+		}
+	}
+
+	private function check_getters()
+	{
+		if (isset($this->options['getters']))
+		{
+			$this->options_to_a('getters');
+
+			foreach ($this->options['getters'] as $method)
+			{
+				if (method_exists($this->model, "get_".$method))
+				{
+					$get_method = "get_".$method;
+					$this->attributes[$method] = $this->model->$get_method();
+				}
 			}
 		}
 	}
