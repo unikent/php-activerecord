@@ -95,6 +95,7 @@ abstract class Connection
 			throw new DatabaseException("Empty connection string");
 
 		$info = static::parse_connection_url($connection_string);
+		
 		$fqclass = static::load_adapter_class($info->protocol);
 
 		try {
@@ -154,7 +155,16 @@ abstract class Connection
 	 */
 	public static function parse_connection_url($connection_url)
 	{
-		$url = @parse_url($connection_url);
+		// parse_url can't cope with :memory:
+		if ($connection_url == "sqlite://:memory:") {
+			$url = array(
+				'scheme' =>'sqlite',
+				'host' => ':memory:'
+			);
+		} else {
+			$url = @parse_url($connection_url);
+		}
+		
 
 		if (!isset($url['host']))
 			throw new DatabaseException('Database host must be specified in the connection string. If you want to specify an absolute filename, use e.g. sqlite://unix(/path/to/file)');
@@ -212,7 +222,6 @@ abstract class Connection
 					$info->charset = $value;
 			}
 		}
-
 		return $info;
 	}
 
@@ -235,8 +244,8 @@ abstract class Connection
 			}
 			else
 				$host = "unix_socket=$info->host";
-
 			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
