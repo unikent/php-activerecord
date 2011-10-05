@@ -6,7 +6,7 @@ namespace ActiveRecord;
 
 /**
  * The base class for your models.
- *
+ * test
  * Defining an ActiveRecord model for a table called people and orders:
  *
  * <code>
@@ -483,6 +483,9 @@ class Model
 		if (($relationship = $table->get_relationship($name)))
 		{
 			$this->__relationships[$name] = $relationship->load($this);
+			if ($this->__relationships[$name]) {
+				
+			}
 			return $this->__relationships[$name];
 		}
 
@@ -777,9 +780,11 @@ class Model
 					if(is_array($value)) {
 						//loop through
 						foreach($value as $model) {
-							$model->save(true, false);
+							if (method_exists($model,'save')) {
+								$model->save(true, false);
+							}
 						}
-					} else {
+					} elseif (method_exists($value,'save')) {
 						$value->save(true, false);
 					}
 				}
