@@ -6,7 +6,7 @@ namespace ActiveRecord;
 
 /**
  * The base class for your models.
- * test
+ * 
  * Defining an ActiveRecord model for a table called people and orders:
  *
  * <code>
