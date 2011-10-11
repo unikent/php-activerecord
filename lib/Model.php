@@ -1,8 +1,10 @@
-<?php
+<?php 
 /**
  * @package ActiveRecord
  */
 namespace ActiveRecord;
+
+
 
 /**
  * The base class for your models.
@@ -772,7 +774,7 @@ class Model
 	{
 		$this->verify_not_readonly('save');
 
-		if($associations) {
+	/*	if($associations) {
 			foreach($this->table()->get_relationship_names() as $name) {
 				if(array_key_exists($name, $this->__relationships)){
 					//its been loaded in so save it.
@@ -789,7 +791,7 @@ class Model
 					}
 				}
 			}
-		}
+		}*/
 		return $this->is_new_record() ? $this->insert($validate) : $this->update($validate);
 	}
 
