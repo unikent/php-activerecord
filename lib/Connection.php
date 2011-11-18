@@ -333,11 +333,10 @@ abstract class Connection
 						return "'".addslashes($v)."'";
 					return $v;
 				}, $values);
-				$data = ' ('.implode(',', $values).')';
 			} else {
-				$data = '';
+				$values = '';
 			}
-			$this->logger->log(sprintf("%s --%s %.3f", $sql, $data, $time));
+			$this->logger->log($sql, $values, $time);
 		}
 
 		return $sth;
